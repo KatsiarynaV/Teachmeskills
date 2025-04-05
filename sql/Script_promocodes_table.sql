@@ -56,9 +56,9 @@ select * from promocodes;
 
 select
 	CASE 
-		when discount_percent between 1 and 10 then 'Discount 1-10%'
-		when discount_percent between 11 and 30 then 'Discount 11-30%'
-		when discount_percent between 31 and 40 then 'Discount 31-40%'
+		when discount_percent between 1 and 9 then 'Discount 1-9%'
+		when discount_percent between 10 and 29 then 'Discount 10-29%'
+		when discount_percent between 30 and 49 then 'Discount 30-49%'
 		when discount_percent >= 50 then 'Discount 50+%'
 		else 'Неизвсетно'
 	END as discount_percent_group,
