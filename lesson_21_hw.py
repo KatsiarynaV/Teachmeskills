@@ -7,15 +7,18 @@
 # ❗️SELECT сделать без использования pandas!❗️
 
 import psycopg2
-import pandas as pd
+from dotenv import load_dotenv
+import os
+import csv
 
 def get_connection():
+    load_dotenv()
     return psycopg2.connect(
-        host='localhost',
-        port=5432,
-        database='demo',
-        user='postgres',
-        password='postgres'
+        host=os.getenv('DB_HOST'),
+        port=os.getenv('DB_PORT'),
+        database=os.getenv('DB_NAME'),
+        user=os.getenv('DB_USER'),
+        password=os.getenv('DB_PASSWORD')
     )
 
 def export_flights_by_routes(departure_city: str, arrival_city: str, file_path, conn):
@@ -38,8 +41,15 @@ def export_flights_by_routes(departure_city: str, arrival_city: str, file_path, 
         and a3.airport_name = %s
         group by f.flight_id, f.flight_no, f.scheduled_departure, f.scheduled_arrival, a.model, a2.airport_name, a3.airport_name;          
     """
-    df = pd.read_sql(query, conn, params=(departure_city, arrival_city))
-    df.to_csv(file_path, index=False)
+
+    with conn.cursor() as cur:
+        cur.execute(query, (departure_city, arrival_city))
+        rows = cur.fetchall()
+        column_names = [desc[0] for desc in cur.description]
+    with open(file_path, mode='w', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f)
+        writer.writerow(column_names)  # Заголовки
+        writer.writerows(rows)         # Данные
     print(f"Данные успешно экспортированы в {file_path}")
 
 # Задача 2. Массовое обновление статусов рейсов
