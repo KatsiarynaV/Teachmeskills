@@ -5,12 +5,15 @@ from airflow.providers.postgres.operators.postgres import PostgresOperator
 from airflow.providers.postgres.hooks.postgres import PostgresHook
 from airflow.utils.trigger_rule import TriggerRule
 from datetime import datetime, timedelta
+from airflow.models import Variable
 import pandas as pd
 import logging
 import os
 import glob
 import requests
 
+TELEGRAM_CHAT_ID = Variable.get("telegram_chat_id")
+TELEGRAM_TOKEN = Variable.get("telegram_token")
 
 logger = logging.getLogger()
 logger.setLevel('INFO')
@@ -88,9 +91,9 @@ def send_telegram_message(**kwargs):
     if not message:
         message = 'No message generated.'
 
-    url = "https://api.telegram.org/bot7747274326:AAFU9ysq7CibYX2eCfJnEoF3DCgzJS0smno/sendMessage"
+    url = "https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
     payload = {
-        "chat_id": "-4674431231",
+        "chat_id": "{TELEGRAM_CHAT_ID}",
         "text": message,
         "parse_mode": "HTML"
     }
